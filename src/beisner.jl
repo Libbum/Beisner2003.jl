@@ -16,11 +16,11 @@ const g = 0.1 # d⁻¹ C grazing coefficient
 
 # Drivers
 # H yr⁻¹ harvest rate
-H = 0.1
+H = 0.1 # Transition above 0.367
 # DOC mg/m2 dissolved organic carbon
-DOC = 4.74 # Exp(1.556)
+DOC = 6.0 # or 18
 # L mg⋅m⁻²⋅d⁻¹ P loading
-L = 1.429; # Exp(0.357)
+L = 2.0 # [0-6]
 
 # State variables
 # B g/m2 piscivore population biomass (pike)
@@ -35,7 +35,7 @@ z = 13.1826/(1 + DOC)^0.61 # log(z) = 1.12 - 0.61log(DOC+1)
 ## A mg/m2 chlorophyll
 
 
-function beisner!(du,u,h,p,t)
+function beisnerd!(du,u,h,p,t)
     A, P, B = u
     α, v, z, g, s, r, q, a, f, b, m, H, L, tau = p
 
@@ -56,10 +56,9 @@ tau = 3
 lags = [tau]
 p = (α, v, z, g, s, r, q, a, f, b, m, H, L, tau)
 tspan = (0.0,10.0)
-prob = DDEProblem(beisner!,u0,h,tspan,p;constant_lags=lags)
+prob = DDEProblem(beisnerd!,u0,h,tspan,p;constant_lags=lags)
 sol = solve(prob, MethodOfSteps(Tsit5()))
 
 plot(sol.t, [a[1] for a in sol.u])
 plot!(sol.t, [a[2] for a in sol.u])
-gui()
 
